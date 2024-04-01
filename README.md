@@ -12,14 +12,14 @@ You will work in a group of two to four students, and each group may select thei
 
 # Project Ideas
 
-Github CI/CD
-Django website
-Wordpress site
-Discord Bot
-Flask Server with NGINX
-Node.js website
-Apache Server with Java app
-Specifications
+- Github CI/CD
+- Django website
+- Wordpress site
+- Discord Bot
+- Flask Server with NGINX
+- Node.js website
+- Apache Server with Java app
+# Specifications
 
 Your application should be based on a tutorial or existing project
 Your application should modify the existing work in some non-trivial way
