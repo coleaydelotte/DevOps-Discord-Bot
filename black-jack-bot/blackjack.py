@@ -138,10 +138,22 @@ class blackjack():
                     print("Dealer's cards: ", self.dealer, "Total: ", self.checkValues()[1])
                     break
 
+# def playAgain():
+#     playAgainBool = True
+#     playA = ""
+#     while playAgainBool == False:
+#         playA = input("Do you want to keep playing? (y/n)").lower
+#         while playA.strip() not in ["y", "n"]:
+#             playA = input("Incorrect (y/n)").lower()
+#             if playA == "y":
+#                 playAgainBool == True
+#     if playAgainBool == True:
+#         blackjack()
+#         playAgain()
 
 def main():
+    # playAgain()
     blackjack()
-
 
 if __name__ == "__main__":
     main()
