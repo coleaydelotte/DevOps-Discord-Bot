@@ -1,50 +1,48 @@
 import random
-class blackjack():
+
+class Blackjack:
     cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]
     playerBusted = False
     dealerBusted = False
     playerStood = False
     dealerStood = False
     cardValues = {
-        "J" : 10,
-        "Q" : 10,
-        "K" : 10,
-        "A" : 11
+        "J": 10,
+        "Q": 10,
+        "K": 10,
+        "A": 11
     }
     player = []
     dealer = []
 
     def __init__(self):
-        print("Welcome to BlackJack!")
         self.dealCards()
 
-    def dealCards(self):
-        print("Dealing cards...")
+    def dealCards(self) -> str:
         self.player.append(random.choice(self.cards))
         self.dealer.append(random.choice(self.cards))
         self.player.append(random.choice(self.cards))
         self.dealer.append(random.choice(self.cards))
         playerTotal, dealerTotal = self.checkValues()
 
-        print("Your cards: ", self.player, "Total: ", playerTotal)
-        print("Dealer's cards: ", self.dealer, "Total: ", dealerTotal)
+        game_state = f"Your cards: {self.player}, Total: {playerTotal}\n"
+        game_state += f"Dealer's cards: [{self.dealer[0]}, X], Total: {dealerTotal - self.dealer[1] if self.dealer[1] in self.cardValues else dealerTotal - self.dealer[1]}"
 
         self.checkBlackJack()
         self.checkWinner()
-        self.hitOrStand()
-        self.checkWinner()
 
-    def checkBust(self):
+        return game_state
+
+    def checkBust(self) -> str:
         playerTotal, dealerTotal = self.checkValues()
         if playerTotal > 21:
-            print("Player busted!")
             self.playerBusted = True
+            return "Player busted!"
         elif dealerTotal > 21:
-            print("Dealer busted!")
             self.dealerBusted = True
-            return
-        elif self.playerStood == True:
-            return
+            return "Dealer busted!"
+        elif self.playerStood:
+            return ""
 
     def checkValues(self):
         playerTotal = 0
@@ -60,100 +58,78 @@ class blackjack():
                 dealerTotal += self.cardValues[card]
             else:
                 dealerTotal += card
-        
+
         return playerTotal, dealerTotal
 
-    def checkWinner(self):
+    def checkWinner(self) -> str:
         if self.playerStood:
             playerTotal, dealerTotal = self.checkValues()
             if self.playerBusted:
-                print("Dealer wins!")
-                return
+                return "Dealer wins!"
             elif self.dealerBusted:
-                print("Player wins!")
-                return
+                return "Player wins!"
             if 21 - playerTotal < 21 - dealerTotal:
-                print("Player wins!")
-                return
+                return "Player wins!"
             if playerTotal == dealerTotal:
-                print("It's a tie!")
-                return
-            print("Dealer wins!")
+                return "It's a tie!"
+            return "Dealer wins!"
         else:
-            return
-        
-    def hitOrStand(self):
-        while not self.playerBusted and not self.playerStood and not self.dealerBusted and not self.dealerStood:
-            move = input("Do you want to hit or stand? ")
-            if move == "hit":
-                self.player.append(random.choice(self.cards))
-                self.checkAces()
-                print("Your cards: ", self.player, "Total: ", self.checkValues()[0])
-                self.checkBust()
-            elif move == "stand":
-                self.playerStood = True
-                self.dealerPlay()
-                break
-            else:
-                print("Invalid move. Please type 'hit' or 'stand'.")
+            return ""
 
-    def checkBlackJack(self):
+    def hitOrStand(self, move: str) -> str:
+        if move.lower() == "hit":
+            if self.playerBusted or self.playerStood or self.dealerBusted or self.dealerStood:
+                return "The game has ended. Please start a new game."
+            self.player.append(random.choice(self.cards))
+            self.checkAces()
+            playerTotal, _ = self.checkValues()
+            bust_message = self.checkBust()
+            if bust_message:
+                return bust_message
+            return f"Your cards: {self.player}, Total: {playerTotal}"
+        elif move.lower() == "stand":
+            if self.playerBusted or self.playerStood or self.dealerBusted or self.dealerStood:
+                return "The game has ended. Please start a new game."
+            self.playerStood = True
+            self.dealerPlay()
+            winner_message = self.checkWinner()
+            playerTotal, dealerTotal = self.checkValues()
+            return f"Player's cards: {self.player}, Total: {playerTotal}\nDealer's cards: {self.dealer}, Total: {dealerTotal}\n{winner_message}"
+        else:
+            return "Invalid move. Please type 'hit' or 'stand'."
+
+    def checkBlackJack(self) -> str:
         playerTotal, dealerTotal = self.checkValues()
         if playerTotal == 21:
-            print("BlackJack! Player wins!")
             self.playerStood = True
+            return "BlackJack! Player wins!"
         elif dealerTotal == 21:
-            print("BlackJack! Dealer wins!")
             self.dealerStood = True
+            return "BlackJack! Dealer wins!"
         else:
-            return
+            return ""
 
-    def dealerPlay(self):
+    def dealerPlay(self) -> None:
         while not self.dealerBusted and not self.dealerStood:
             playerTotal, dealerTotal = self.checkValues()
             if dealerTotal < 17:
                 self.dealer.append(random.choice(self.cards))
-                playerTotal, dealerTotal = self.checkValues()
-                print("Dealer's cards: ", self.dealer, "Total: ", dealerTotal)
                 self.checkAces()
-                self.checkBust()
-                self.dealerPlay()
+                bust_message = self.checkBust()
+                if bust_message:
+                    break
             else:
                 self.dealerStood = True
 
-    def checkAces(self):
+    def checkAces(self) -> None:
         playerTotal, dealerTotal = self.checkValues()
         if playerTotal > 21:
-            for card in self.player:
+            for i, card in enumerate(self.player):
                 if card == "A":
-                    self.player[self.player.index("A")] = 1
-                    playerTotal -= 10
-                    print("Your cards: ", self.player, "Total: ", self.checkValues()[0])
+                    self.player[i] = 1
                     break
         if dealerTotal > 21:
-            for card in self.dealer:
+            for i, card in enumerate(self.dealer):
                 if card == "A":
-                    self.dealer[self.dealer.index("A")] = 1
-                    dealerTotal -= 10
-                    print("Dealer's cards: ", self.dealer, "Total: ", self.checkValues()[1])
+                    self.dealer[i] = 1
                     break
-
-# def playAgain():
-#     playAgainBool = True
-#     playA = ""
-#     while playAgainBool == False:
-#         playA = input("Do you want to keep playing? (y/n)").lower
-#         while playA.strip() not in ["y", "n"]:
-#             playA = input("Incorrect (y/n)").lower()
-#             if playA == "y":
-#                 playAgainBool == True
-#     if playAgainBool == True:
-#         blackjack()
-#         playAgain()
-
-def main():
-    # playAgain()
-    blackjack()
-
-if __name__ == "__main__":
-    main()
