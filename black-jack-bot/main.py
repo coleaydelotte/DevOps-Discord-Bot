@@ -64,9 +64,9 @@ async def on_message(message: Message) -> None:
 
     await bot.process_commands(message)
 
-    response = responses.get_response(message.content)
-    if response:
-        await message.channel.send(response)
+    # response = responses.get_response(message.content)
+    # if response:
+    #     await message.channel.send(response)
 
 def main() -> None:
     bot.run(TOKEN)
