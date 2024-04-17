@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set the environment variable for the Discord token
-ENV DISCORD_TOKEN=<>
+ENV DISCORD_TOKEN=<Token Here>
 
 # Run the application
 CMD ["python", "main.py"]
