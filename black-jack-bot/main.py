@@ -1,71 +1,75 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
-from responses import get_response
-from blackjack import Blackjack
+from discord import Intents, Message
+from discord.ext import commands
+from blackjack import BlackjackGame
+import responses
+# import redis
+from time import time
 
-# STEP 0: LOAD OUR TOKEN FROM SOMEWHERE SAFE
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
+# REDIS_HOST: Final[str] = os.getenv('REDIS_HOST')
+# REDIS_PORT: Final[int] = int(os.getenv('REDIS_PORT'))
 
-# STEP 1: BOT SETUP
+# r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+
 intents: Intents = Intents.default()
-intents.message_content = True  # NOQA
-client: Client = Client(intents=intents)
+intents.message_content = True
+bot: commands.Bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Store active Blackjack games
-active_games = {}
+@bot.command(name='blackjack', aliases=['bj'])
+async def blackjack(ctx):
+    # timestamp = int(time())
+    # r.set(f'blackjack:{ctx.author.id}', timestamp)
 
-# STEP 2: MESSAGE FUNCTIONALITY
-async def send_message(message: Message, user_message: str) -> None:
-    if not user_message:
-        print('(Message was empty because intents were not enabled probably)')
-        return
+    game = BlackjackGame()
+    player_total, dealer_total = game.deal_cards()
 
-    is_private = user_message[0] == '?'
-    user_message = user_message[1:] if is_private else user_message
+    await ctx.send("BlackJack game started!")
+    await ctx.send(f"Your cards: {game.player}, Total: {player_total}")
+    await ctx.send(f"Dealer's cards: {game.dealer[:1]}")
 
-    try:
-        if 'play blackjack' in user_message.lower():
-            game = Blackjack()
-            response = "Starting a new Blackjack game!\n" + game.dealCards()
-            active_games[message.author.id] = game
-        elif 'hit' in user_message.lower() or 'stand' in user_message.lower():
-            game = active_games.get(message.author.id)
-            if game:
-                move = user_message.lower().split()[0]
-                response = game.hitOrStand(move)
+    while True:
+        response = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+        if response.content.lower() == "hit":
+            player_total, _ = game.hit()
+            await ctx.send(f"Your cards: {game.player}, Total: {player_total}")
+            if player_total > 21:
+                await ctx.send("Busted! Dealer wins.")
+                break
+        elif response.content.lower() == "stand":
+            while dealer_total < 17:
+                dealer_total, _ = game.hit()
+            await ctx.send(f"Dealer's cards: {game.dealer}, Total: {dealer_total}")
+            if dealer_total > 21:
+                await ctx.send("Dealer busted! You win.")
+            elif dealer_total >= player_total:
+                await ctx.send("Dealer wins.")
             else:
-                response = "You haven't started a Blackjack game yet. Type 'play blackjack' to start a new game."
+                await ctx.send("You win!")
+            break
         else:
-            response = get_response(user_message)
+            await ctx.send("Invalid move. Please type 'hit' or 'stand'.")
 
-        await (message.author.send(response) if is_private else message.channel.send(response))
-    except Exception as e:
-        print(e)
-
-# STEP 3: HANDLING THE STARTUP FOR OUR BOT
-@client.event
+@bot.event
 async def on_ready() -> None:
-    print(f'{client.user} is now running!')
+    print(f'{bot.user} is now running!')
 
-# STEP 4: HANDLING INCOMING MESSAGES
-@client.event
+@bot.event
 async def on_message(message: Message) -> None:
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
-    username: str = str(message.author)
-    user_message: str = message.content
-    channel: str = str(message.channel)
-    print(f'[{channel}] {username}: "{user_message}"')
+    await bot.process_commands(message)
 
-    await send_message(message, user_message)
+    response = responses.get_response(message.content)
+    if response:
+        await message.channel.send(response)
 
-# STEP 5: MAIN ENTRY POINT
 def main() -> None:
-    client.run(token=TOKEN)
+    bot.run(TOKEN)
 
 if __name__ == '__main__':
     main()
