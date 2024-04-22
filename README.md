@@ -6,39 +6,9 @@ When Main.py is ran and the bot is in a Discord server, it will appear online. A
 
 # How to run with Docker
 
-#### Public Docker Repository: https://hub.docker.com/r/franthe3rd/blackjackbot
-
-
-
-### 1. Pull the Docker Image
-
-```bash
-docker pull franthe3rd/blackjackbot
-```
-
-### 2. Run the Docker Container
-
-```bash
-docker run -d --name blackjackbot franthe3rd/blackjackbot
-```
-
-This command will start the Discord bot container in detached mode.
-
-### 3. Stop the Docker Container
-
-To stop the running container, use the following command:
-
-```bash
-docker stop blackjackbot
-```
-
-### 4. Remove the Docker Container
-
-If you want to remove the container from your system, use the following command:
-
-```bash
-docker rm blackjackbot
-```
+- First clone our github repository
+- Then cd into our github repository and then run this command `cd black-jack-bot/ && docker-compose up -d`
+- To stop it run this command `docker-compose down`
 
 
 # Contributors
