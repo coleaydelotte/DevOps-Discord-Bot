@@ -24,8 +24,5 @@ ENV DISCORD_TOKEN=<Your Token>
 # Expose the port if your application is running a web server
 # EXPOSE 8000
 
-# Start Redis server
-CMD ["redis-server", "--daemonize", "yes"]
-
-# Run the application
-CMD ["python", "main.py"]
+# Start Redis server and run the application
+CMD ["sh", "-c", "redis-server --daemonize yes && python main.py"]
