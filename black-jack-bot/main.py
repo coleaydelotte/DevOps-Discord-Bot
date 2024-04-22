@@ -1,19 +1,19 @@
+from datetime import datetime
 from typing import Final
 import os
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
 from blackjack import BlackjackGame
-import responses
-# import redis
+import redis
 from time import time
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
-# REDIS_HOST: Final[str] = os.getenv('REDIS_HOST')
-# REDIS_PORT: Final[int] = int(os.getenv('REDIS_PORT'))
+REDIS_HOST: Final[str] = os.getenv('REDIS_HOST')
+REDIS_PORT: Final[int] = int(os.getenv('REDIS_PORT'))
 
-# r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 intents: Intents = Intents.default()
 intents.message_content = True
@@ -21,8 +21,8 @@ bot: commands.Bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command(name='blackjack', aliases=['bj'])
 async def blackjack(ctx):
-    # timestamp = int(time())
-    # r.set(f'blackjack:{ctx.author.id}', timestamp)
+    timestamp = int(time())
+    r.set(f'blackjack:{ctx.author.id}', timestamp)
 
     game = BlackjackGame()
     player_total, dealer_total = game.deal_cards()
@@ -53,6 +53,16 @@ async def blackjack(ctx):
         else:
             await ctx.send("Invalid move. Please type 'hit' or 'stand'.")
 
+@bot.command(name='players', aliases=['p'])
+async def players(ctx):
+    keys_with_timestamp = [(key.decode(), int(r.get(key))) for key in r.keys("blackjack:*")]
+    recent_entries = keys_with_timestamp[-10:]
+    if recent_entries:
+        message = "\n".join([f"{index + 1}. <@{data[0].split(':')[1]}>: Last played on {datetime.utcfromtimestamp(data[1]).strftime('%Y-%m-%d')}" for index, data in enumerate(recent_entries)])
+        await ctx.send(f"**Recent Players:**\n{message}")
+    else:
+        await ctx.send("No recent players found.")
+
 @bot.event
 async def on_ready() -> None:
     print(f'{bot.user} is now running!')
@@ -73,3 +83,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
+

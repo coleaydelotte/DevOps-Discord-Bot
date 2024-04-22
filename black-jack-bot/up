@@ -1,0 +1,6 @@
+docker run -d --network devops-discordbot --name redisdb -p 6379:6379 -v $(pwd)/data:/data redis redis-server --save 10
+docker run -d --network devops-discordbot --name bot -v $(pwd)/.env devops-discordbot
+
+docker rm -r bot
+docker exec -it redisdb redis-cli save
+docker rm -f redisdb
