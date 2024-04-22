@@ -11,8 +11,7 @@ from time import time
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 REDIS_HOST: Final[str] = os.getenv('REDIS_HOST')
-REDIS_PORT: Final[int] = int(os.getenv('REDIS_PORT'))
-
+REDIS_PORT: Final[int] = int(os.getenv('REDIS_PORT') or '6379')
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 intents: Intents = Intents.default()
