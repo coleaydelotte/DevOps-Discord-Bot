@@ -1,28 +1,13 @@
-# Use the official Python image as the base image
-FROM python:3.9-slim
+FROM amazonlinux
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    redis-server \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy the requirements file and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
-COPY . .
+RUN python3 -m venv .venv
+RUN .venv/bin/pip install -r requirements.txt
 
-# Set the Discord token environment variable
-ENV DISCORD_TOKEN=<Your Token>
+COPY main.py .
+COPY blackjack.py .
 
-# Expose the port if your application is running a web server
-# EXPOSE 8000
-
-# Start Redis server and run the application
-CMD ["sh", "-c", "redis-server --daemonize yes && python main.py"]
+CMD [".venv/bin/python", "main.py"]
