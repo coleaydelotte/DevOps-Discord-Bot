@@ -1,11 +1,14 @@
-# version: '3'
-# services:
-#   discord-bot:
-#     build: .
-#     environment:
-#       - REDIS_HOST=redis
-#       - REDIS_PORT=6379
-#     depends_on:
-#       - redis
-#   redis:
-#     image: redis
+version: '3'
+services:
+  discord-bot:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+    command: ["redis-server", "--save", "10", "1"]
+    volumes:
+      - ./data:/data
