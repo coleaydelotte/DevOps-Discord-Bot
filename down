@@ -1,3 +1,3 @@
-docker rm -r bot
+docker rm -f bot
 docker exec -it redisdb redis-cli save
 docker rm -f redisdb
