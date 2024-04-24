@@ -6,45 +6,30 @@ When Main.py is ran and the bot is in a Discord server, it will appear online. A
 
 
 # How To Run On Docker
-#### Public Docker Repository: https://hub.docker.com/r/franthe3rd/discordblackjackbot
 
-### 1. Pull the Docker Image
+### 1. Create docker image from the dockerfile
 
-```bash
-docker pull franthe3rd/discordblackjackbot:latest
-```
+- `docker build -t discord-bot .`
 
-### 2. Run the Docker Container
+#### 2. Use a named Docker network and connect both containers to it:
 
-```bash
-docker run franthe3rd/discordblackjackbot:latest
-```
+- `docker network create my-network`
 
-This command will start the Discord bot container in detached mode.
+#### 3. Then, run your Redis container and connect it to the newly created network:
 
-### 3. Stop the Docker Container
+- `docker run --name redis --network my-network -d redis`
 
-To stop the running container, use the following command:
+#### 4. Finally, run your Python application container and connect it to the same network, using the name of the Redis container as the REDIS_HOST:
 
-```bash
-docker ps
-```
+- `docker run --network my-network -e DISCORD_TOKEN=<Your Token> -e REDIS_HOST=redis discord-bot`
 
-```bash
-docker stop <container_id_or_name>
+#### 4. To Remove the network:
 
-```
+- `docker network rm my-network`
 
-### 4. Remove the Docker Container
 
-If you want to remove the container from your system, use the following command:
 
-```bash
-docker rm <container_id_or_name>
-```
-```bash
-docker rmi franthe3rd/discordblackjackbot:latest
-```
+
 
 # Contributors
 - Cole Aydelotte - coleaydelotte
