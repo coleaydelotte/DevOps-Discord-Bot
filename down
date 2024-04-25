@@ -1,8 +1,8 @@
 echo Deleting bot container...
-docker rm -f devops-discord-bot-discord-bot-1
+sudo docker rm -f devops-discord-bot-discord-bot-1
 echo
 echo Saving contents of the redis container...
-docker exec -it devops-discord-bot-redis-1 redis-cli save
+sudo docker exec -it devops-discord-bot-redis-1 redis-cli save
 echo
 echo Deleting redis container...
-docker rm -f devops-discord-bot-redis-1
+sudo docker rm -f devops-discord-bot-redis-1
