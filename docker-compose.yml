@@ -1,9 +1,9 @@
 version: '3'
 services:
   discord-bot:
-    build: .
+    build: ./black-jack-bot/.
     env_file:
-      - .env
+      - ./black-jack-bot/.env
     depends_on:
       - redis
 
