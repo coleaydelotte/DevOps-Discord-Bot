@@ -24,12 +24,32 @@ REDIS_PORT=6379
 ```
 In `DISCORD_TOKEN=<discordToken>` replace `<discordToken>` with the actual token.
 
-### 4. cd back into the repositories root folder, and then type `./up` in the terminal.
+### 4. 
+cd back into the repositories root folder, and then type `./up` in the terminal.
 this will run the project using `docker-compose` so you will need docker installed.
 to install docker it can be found at: https://docs.docker.com/desktop/install/mac-install/
 
+### 5. 
+Stop the bot by typing the following command in the project root: `./down_local`.
 
 
+# Running on a EC2 Instance
+
+paste the following command in the new instance:
+`sudo yum install -y git; git clone https://github.com/cs220s24/DevOps-Discord-Bot.git; cd DevOps-Discord-Bot; nano black-jack-bot/.env; ./ec2_deploy.sh`
+
+this will prompt you with a terminal text editor.
+
+Paste this: 
+```shell
+DISCORD_TOKEN=<discordToken>
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+In `DISCORD_TOKEN=<discordToken>` replace `<discordToken>` with the actual token.
+
+the bot will now finish deploying and automatically start up. You can stop the bot with the 
+command `./down_ec2` in the project's root directory.
 
 # Contributors
 - Cole Aydelotte - coleaydelotte
